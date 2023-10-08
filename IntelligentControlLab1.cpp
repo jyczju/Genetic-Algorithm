@@ -176,9 +176,7 @@ pair<double*, double*> GA::decodeDNA(int** population_matrix)
             y_vector[i] += y_matrix[i][j] * decode_vector[j];
         y_vector[i] = y_vector[i] / (pow(2, dna_size) - 1) * (y_high - y_low) + y_low;
     }
-
-    //通过pair返回两个值
-    return make_pair(x_vector, y_vector);
+    return make_pair(x_vector, y_vector); //通过pair返回两个值
 }
 
 /**
@@ -415,17 +413,17 @@ void GA::addSuperDNA(int** population_matrix)
 int main()
 {
     cout << "Begin...\n" << endl;
-    double (*point_of_function)(double, double) = fitness_function;
-    tuple<double, double, double> result;
-    double current_x = 0, current_y = 0, current_max = -1000, maxx = 0, maxy = 0, maxValue = -1000;
+    double (*point_of_function)(double, double) = fitness_function; //定义函数指针
+    tuple<double, double, double> result; //用于存储当前迭代结果
+    double current_x = 0, current_y = 0, current_max = -1000;
 
     // fitness function 1
-    //GA ga(30, 100, 200, 0.7, 0.15, -10, 10, -10, 10, 'f'); //位翻转
-    //GA ga(30, 200, 400, 0.7, 0.1, -10, 10, -10, 10, 'd'); //柯西分布
+    //GA ga(30, 100, 200, 0.7, 0.15, -10, 10, -10, 10, 'f'); //位翻转变异
+    //GA ga(30, 200, 400, 0.7, 0.1, -10, 10, -10, 10, 'd'); //柯西变异
     
     //fitness function 2
-    //GA ga(30, 100, 200, 0.7, 0.2, 0, 10, 0, 10, 'f'); //位翻转
-    GA ga(30, 200, 300, 0.6, 0.09, 0, 10, 0, 10, 'd'); //柯西分布
+    //GA ga(30, 100, 200, 0.7, 0.2, 0, 10, 0, 10, 'f'); //位翻转变异
+    GA ga(30, 200, 300, 0.6, 0.09, 0, 10, 0, 10, 'd'); //柯西变异
 
     ga.getFunction(point_of_function); //获得函数指针
 
@@ -434,30 +432,15 @@ int main()
     //种群演化迭代
     for (int r = 0; r < ga.generation_num; r++)
     {
-        //cout << "Round " << (r+1) << endl;
-        ga.population_matrix = ga.updatePopulation(ga.population_matrix);
-        ga.fitness_vector = ga.getFitnessVector(ga.population_matrix);
-        ga.population_matrix = ga.naturalSelect(ga.population_matrix, ga.fitness_vector);
-        ga.addSuperDNA(ga.population_matrix);
-        result = ga.getResult(ga.population_matrix);
-        
-        /*tie(current_x, current_y, current_max) = result;
-        if (current_max > maxValue)
-        {
-            maxx = current_x;
-            maxy = current_y;
-            maxValue = current_max;
-        }*/
-
-        //cout << endl;
+        ga.fitness_vector = ga.getFitnessVector(ga.population_matrix); //获取种群适应度
+        ga.population_matrix = ga.naturalSelect(ga.population_matrix, ga.fitness_vector); //自然选择
+        ga.population_matrix = ga.updatePopulation(ga.population_matrix); //交叉变异
+        ga.addSuperDNA(ga.population_matrix); //加入超级个体
+        result = ga.getResult(ga.population_matrix); //获得当前迭代结果
     }
     cout << "End..." << endl;
     cout << "-----------------------------" << endl;
     cout << "GA result:" << endl;
-
-    //cout << "x:" << maxx << endl;
-    //cout << "y:" << maxy << endl;
-    //cout << "maxValue:" << maxValue << endl;
     
     tie(current_x, current_y, current_max) = result;
     cout << "x:" << current_x << endl;
